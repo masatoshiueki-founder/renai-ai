@@ -4,14 +4,14 @@
 
 @layer base {
   body {
-    @apply bg-pink-50 text-gray-800;
+    @apply text-gray-800;
   }
 }
 
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: #f9a8d4 transparent;
+    scrollbar-color: rgba(0,0,0,0.1) transparent;
   }
   .scrollbar-thin::-webkit-scrollbar {
     width: 4px;
@@ -20,7 +20,22 @@
     background: transparent;
   }
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: #f9a8d4;
+    background-color: rgba(0,0,0,0.15);
     border-radius: 9999px;
+  }
+
+  @keyframes fadeSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-slide-in {
+    animation: fadeSlideIn 0.25s ease-out forwards;
   }
 }

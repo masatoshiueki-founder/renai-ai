@@ -1,7 +1,12 @@
-import { Message } from "@/app/page";
+import { Message, KoiLogo } from "@/app/page";
 
 interface Props {
   message: Message;
+  showAvatar: boolean;
+}
+
+function formatTime(date: Date) {
+  return date.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });
 }
 
 function parseAssistantContent(content: string) {
@@ -13,19 +18,16 @@ function parseAssistantContent(content: string) {
     { key: "【送るメッセージ案】", emoji: "💌", title: "送るメッセージ案" },
   ];
 
-  let remaining = content;
   const indices: { key: string; emoji: string; title: string; index: number }[] = [];
 
   for (const pattern of sectionPatterns) {
-    const idx = remaining.indexOf(pattern.key);
+    const idx = content.indexOf(pattern.key);
     if (idx !== -1) {
       indices.push({ ...pattern, index: idx });
     }
   }
 
-  if (indices.length === 0) {
-    return null;
-  }
+  if (indices.length === 0) return null;
 
   indices.sort((a, b) => a.index - b.index);
 
@@ -33,59 +35,86 @@ function parseAssistantContent(content: string) {
     const current = indices[i];
     const next = indices[i + 1];
     const start = current.index + current.key.length;
-    const end = next ? next.index : remaining.length;
-    const body = remaining.slice(start, end).trim();
+    const end = next ? next.index : content.length;
+    const body = content.slice(start, end).trim();
     sections.push({ title: current.title, emoji: current.emoji, body });
   }
 
   return sections;
 }
 
-export default function ChatMessage({ message }: Props) {
+export default function ChatMessage({ message, showAvatar }: Props) {
   const isUser = message.role === "user";
 
   if (isUser) {
     return (
-      <div className="flex justify-end">
-        <div className="max-w-[80%] bg-pink-400 text-white rounded-2xl rounded-tr-sm px-4 py-3 shadow-sm">
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+      <div className="flex flex-col items-end gap-0.5 animate-fade-slide-in mb-1">
+        <div className="flex items-end gap-1.5">
+          {/* 既読・時刻 */}
+          <div className="flex flex-col items-end gap-0.5 pb-0.5">
+            <span
+              className={`text-[10px] leading-none font-medium transition-colors duration-300 ${
+                message.read ? "text-[#06C755]" : "text-gray-400"
+              }`}
+            >
+              {message.read ? "既読" : "未読"}
+            </span>
+            <span className="text-[10px] text-gray-400 leading-none">
+              {formatTime(message.timestamp)}
+            </span>
+          </div>
+          {/* 吹き出し */}
+          <div className="max-w-[72%] bg-[#06C755] text-white px-4 py-2.5 rounded-[18px] rounded-br-[4px] shadow-sm">
+            <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+          </div>
         </div>
       </div>
     );
   }
 
+  // AI メッセージ
   const sections = parseAssistantContent(message.content);
 
   return (
-    <div className="flex items-start gap-3">
-      <div className="w-8 h-8 rounded-full bg-pink-400 flex items-center justify-center text-white text-sm flex-shrink-0 mt-1">
-        💗
+    <div className="flex items-end gap-2 animate-fade-slide-in mb-1">
+      {/* アバター（連続メッセージでは非表示） */}
+      <div className="w-9 flex-shrink-0 self-end mb-0.5">
+        {showAvatar ? (
+          <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center shadow-sm overflow-hidden">
+            <KoiLogo size={28} />
+          </div>
+        ) : null}
       </div>
-      <div className="max-w-[85%] space-y-3">
-        {sections ? (
-          sections.map((section) => (
-            <div
-              key={section.title}
-              className="bg-white border border-pink-100 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm"
-            >
-              <div className="flex items-center gap-1.5 mb-2">
-                <span className="text-base">{section.emoji}</span>
-                <span className="text-sm font-semibold text-pink-500">
-                  {section.title}
-                </span>
+
+      <div className="flex items-end gap-1.5 max-w-[72%]">
+        <div className="space-y-1.5 flex-1">
+          {sections ? (
+            sections.map((section) => (
+              <div
+                key={section.title}
+                className="bg-white px-4 py-3 rounded-[18px] rounded-bl-[4px] shadow-sm"
+              >
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <span className="text-sm">{section.emoji}</span>
+                  <span className="text-xs font-bold text-[#06C755]">{section.title}</span>
+                </div>
+                <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap">
+                  {section.body}
+                </p>
               </div>
+            ))
+          ) : (
+            <div className="bg-white px-4 py-2.5 rounded-[18px] rounded-bl-[4px] shadow-sm">
               <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap">
-                {section.body}
+                {message.content}
               </p>
             </div>
-          ))
-        ) : (
-          <div className="bg-white border border-pink-100 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
-            <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap">
-              {message.content}
-            </p>
-          </div>
-        )}
+          )}
+        </div>
+        {/* 時刻 */}
+        <span className="text-[10px] text-gray-400 pb-1 flex-shrink-0 self-end">
+          {formatTime(message.timestamp)}
+        </span>
       </div>
     </div>
   );
