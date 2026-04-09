@@ -10,7 +10,7 @@ export interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
-  read?: boolean; // ユーザーメッセージのみ使用
+  read?: boolean;
 }
 
 export default function Home() {
@@ -19,12 +19,8 @@ export default function Home() {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
   const sendMessage = async (text: string) => {
@@ -43,12 +39,10 @@ export default function Home() {
     setMessages(updatedMessages);
     setIsLoading(true);
 
-    // 800ms後に「既読」へ（AIが読んだ演出）
     setTimeout(() => {
       setMessages((prev) =>
         prev.map((m) => (m.id === msgId ? { ...m, read: true } : m))
       );
-      // 既読になってから少し経って入力中を表示
       setTimeout(() => setIsTyping(true), 300);
     }, 800);
 
@@ -70,26 +64,28 @@ export default function Home() {
       }
 
       const data = await res.json();
-
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: data.content,
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content: data.content,
+          timestamp: new Date(),
+        },
+      ]);
     } catch (error) {
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content:
-          error instanceof Error
-            ? error.message
-            : "エラーが発生しました。しばらくしてからもう一度お試しください。",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, errorMessage]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content:
+            error instanceof Error
+              ? error.message
+              : "エラーが発生しました。しばらくしてからもう一度お試しください。",
+          timestamp: new Date(),
+        },
+      ]);
     } finally {
       setIsTyping(false);
       setIsLoading(false);
@@ -97,37 +93,67 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-screen chat-bg">
+    <div className="glamour-bg flex flex-col h-screen relative overflow-hidden">
+      {/* 装飾ブロブ */}
+      <div
+        className="absolute -top-24 -right-24 w-72 h-72 rounded-full pointer-events-none opacity-30 blur-3xl"
+        style={{ background: "radial-gradient(circle, #fde68a, #fb7185)" }}
+      />
+      <div
+        className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full pointer-events-none opacity-25 blur-3xl"
+        style={{ background: "radial-gradient(circle, #818cf8, #6d28d9)" }}
+      />
+
       <Header isTyping={isTyping} />
 
-      <main className="flex-1 flex flex-col max-w-2xl mx-auto w-full overflow-hidden">
-        {/* Chat area */}
-        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1 scrollbar-thin">
+      <main className="relative flex-1 flex flex-col max-w-2xl mx-auto w-full overflow-hidden">
+        {/* チャットエリア */}
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-1 scrollbar-hide">
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full py-16 text-center">
-              <div
-                className="w-24 h-24 rounded-3xl flex items-center justify-center mb-5 shadow-xl overflow-hidden"
-                style={{
-                  background: "linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)",
-                  boxShadow: "0 8px 32px rgba(6,199,85,0.25)",
-                }}
-              >
-                <KoiLogo size={60} />
+            <div className="flex flex-col items-center justify-center h-full text-center">
+              {/* ロゴ */}
+              <div className="animate-float mb-6">
+                <div
+                  className="w-28 h-28 rounded-[2rem] flex items-center justify-center shadow-2xl"
+                  style={{
+                    background: "rgba(255,255,255,0.22)",
+                    border: "1.5px solid rgba(255,255,255,0.45)",
+                    backdropFilter: "blur(12px)",
+                    boxShadow: "0 12px 48px rgba(168,85,247,0.35), inset 0 1px 1px rgba(255,255,255,0.5)",
+                  }}
+                >
+                  <KoiLogo size={68} />
+                </div>
               </div>
-              <p className="font-extrabold text-xl mb-1 shimmer-text">KoiAI</p>
-              <p className="text-[#3d7a50]/70 text-xs mb-8">Love advice, powered by AI</p>
-              <div className="grid grid-cols-1 gap-2 w-full max-w-xs">
+
+              <h2 className="shimmer-text text-3xl font-extrabold mb-1 tracking-tight">
+                KoiAI
+              </h2>
+              <p className="text-white/60 text-sm mb-2 font-medium">
+                Love advice, powered by AI
+              </p>
+              <p className="text-white/50 text-xs mb-10">
+                恋のお悩み、なんでも話してね 🌸
+              </p>
+
+              {/* サジェスト */}
+              <div className="grid grid-cols-1 gap-2.5 w-full max-w-xs">
                 {[
                   "好きな人に連絡したいけど、どうすればいい？",
                   "彼氏/彼女とケンカしてしまった",
                   "告白するタイミングがわからない",
-                ].map((suggestion) => (
+                ].map((s) => (
                   <button
-                    key={suggestion}
-                    onClick={() => sendMessage(suggestion)}
-                    className="text-left text-sm bg-white/80 rounded-2xl px-4 py-3 text-gray-600 hover:bg-white transition-all shadow-sm hover:shadow-md hover:translate-x-1 duration-200"
+                    key={s}
+                    onClick={() => sendMessage(s)}
+                    className="text-left text-sm px-4 py-3 rounded-2xl text-white/90 transition-all duration-200 hover:scale-[1.02] active:scale-95"
+                    style={{
+                      background: "rgba(255,255,255,0.15)",
+                      border: "1px solid rgba(255,255,255,0.28)",
+                      backdropFilter: "blur(12px)",
+                    }}
                   >
-                    {suggestion}
+                    {s}
                   </button>
                 ))}
               </div>
@@ -145,19 +171,30 @@ export default function Home() {
             ))
           )}
 
+          {/* タイピングインジケーター */}
           {isTyping && (
-            <div className="flex items-end gap-2 pt-1 animate-fade-slide-in">
+            <div className="flex items-end gap-2 pt-1 animate-pop-in">
               <div
-                className="w-9 h-9 rounded-2xl overflow-hidden flex items-center justify-center flex-shrink-0 shadow-md"
-                style={{ background: "linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)" }}
+                className="w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg"
+                style={{
+                  background: "rgba(255,255,255,0.22)",
+                  border: "1px solid rgba(255,255,255,0.4)",
+                  backdropFilter: "blur(12px)",
+                }}
               >
-                <KoiLogo size={28} />
+                <KoiLogo size={26} />
               </div>
-              <div className="bg-white px-4 py-3 rounded-[18px] rounded-bl-[4px] shadow-sm">
-                <div className="flex gap-1 items-center h-4">
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+              <div
+                className="px-5 py-3 rounded-[20px] rounded-bl-[6px] shadow-lg"
+                style={{
+                  background: "rgba(255,255,255,0.88)",
+                  backdropFilter: "blur(16px)",
+                }}
+              >
+                <div className="flex gap-1.5 items-center h-4">
+                  <span className="w-2 h-2 bg-purple-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                  <span className="w-2 h-2 bg-pink-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                  <span className="w-2 h-2 bg-fuchsia-400 rounded-full animate-bounce" />
                 </div>
               </div>
             </div>
@@ -172,25 +209,53 @@ export default function Home() {
   );
 }
 
-// ロゴSVGコンポーネント（page内で共有）
+/* ─── KoiAI ロゴ SVG ─── */
 export function KoiLogo({ size = 36 }: { size?: number }) {
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 36 36"
+      viewBox="0 0 40 40"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
+      <defs>
+        <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%"   stopColor="#f472b6" />
+          <stop offset="50%"  stopColor="#c084fc" />
+          <stop offset="100%" stopColor="#818cf8" />
+        </linearGradient>
+        <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%"   stopColor="#fde68a" />
+          <stop offset="100%" stopColor="#fb923c" />
+        </linearGradient>
+      </defs>
       {/* ハート */}
       <path
-        d="M18 30C18 30 5 21.5 5 13.5C5 9.36 8.36 6 12.5 6C14.86 6 16.96 7.1 18 8.82C19.04 7.1 21.14 6 23.5 6C27.64 6 31 9.36 31 13.5C31 21.5 18 30 18 30Z"
-        fill="#FF4D6D"
+        d="M20 33C20 33 5 23.5 5 14.5C5 10.09 8.58 6.5 13 6.5C15.6 6.5 17.92 7.74 20 9.7C22.08 7.74 24.4 6.5 27 6.5C31.42 6.5 35 10.09 35 14.5C35 23.5 20 33 20 33Z"
+        fill="url(#heartGrad)"
       />
       {/* ハイライト */}
-      <ellipse cx="13" cy="12" rx="3" ry="2" fill="white" opacity="0.35" transform="rotate(-20 13 12)" />
-      {/* キラキラ */}
-      <path d="M28 7L28.7 9L30.7 9L29.1 10.2L29.7 12.2L28 11L26.3 12.2L26.9 10.2L25.3 9L27.3 9Z" fill="#FFD700" />
+      <ellipse
+        cx="14"
+        cy="13"
+        rx="3.5"
+        ry="2"
+        fill="white"
+        opacity="0.4"
+        transform="rotate(-25 14 13)"
+      />
+      {/* 星 */}
+      <path
+        d="M32 7L32.8 9.4L35.4 9.4L33.3 10.9L34.1 13.3L32 11.8L29.9 13.3L30.7 10.9L28.6 9.4L31.2 9.4Z"
+        fill="url(#starGrad)"
+      />
+      {/* 小さい星 */}
+      <path
+        d="M7 9L7.5 10.5L9 10.5L7.8 11.4L8.3 12.9L7 12L5.7 12.9L6.2 11.4L5 10.5L6.5 10.5Z"
+        fill="white"
+        opacity="0.7"
+      />
     </svg>
   );
 }
