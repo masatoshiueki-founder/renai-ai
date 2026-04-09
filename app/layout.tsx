@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "恋愛相談AI",
-  description: "AIがあなたの恋愛のお悩みにアドバイスします",
+  title: "KoiAI",
+  description: "Love advice, powered by AI",
 };
 
 export default function RootLayout({

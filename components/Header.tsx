@@ -6,8 +6,8 @@ export default function Header() {
           💗
         </div>
         <div>
-          <h1 className="text-lg font-bold text-pink-500">恋愛相談AI</h1>
-          <p className="text-xs text-gray-400">あなたの恋を応援します</p>
+          <h1 className="text-lg font-bold text-pink-500">KoiAI</h1>
+          <p className="text-xs text-gray-400">Love advice, powered by AI</p>
         </div>
       </div>
     </header>
