@@ -10,30 +10,15 @@ function formatTime(date: Date) {
 }
 
 const SECTION_STYLES = {
-  "相手の心理": {
-    gradient: "linear-gradient(135deg, #fff5f7 0%, #ffe4ea 100%)",
-    border: "2px solid rgba(255,143,171,0.45)",
-    labelColor: "#e05580",
-    emoji: "🧠",
-  },
-  "取るべき行動": {
-    gradient: "linear-gradient(135deg, #fff6f0 0%, #ffe8dd 100%)",
-    border: "2px solid rgba(255,130,100,0.45)",
-    labelColor: "#d95f3b",
-    emoji: "✨",
-  },
-  "送るメッセージ案": {
-    gradient: "linear-gradient(135deg, #fffaf4 0%, #ffeedd 100%)",
-    border: "2px solid rgba(255,180,110,0.45)",
-    labelColor: "#c97c2a",
-    emoji: "💌",
-  },
+  "相手の心理":     { border: "#FF8FAB", label: "#E05580", emoji: "🧠" },
+  "取るべき行動":   { border: "#FF9B72", label: "#CC5A30", emoji: "✨" },
+  "送るメッセージ案": { border: "#FF8FAB", label: "#E05580", emoji: "💌" },
 } as const;
 
 function parseAssistantContent(content: string) {
   const patterns = [
-    { key: "【相手の心理】",      title: "相手の心理" as const },
-    { key: "【取るべき行動】",    title: "取るべき行動" as const },
+    { key: "【相手の心理】",       title: "相手の心理" as const },
+    { key: "【取るべき行動】",     title: "取るべき行動" as const },
     { key: "【送るメッセージ案】", title: "送るメッセージ案" as const },
   ];
 
@@ -54,95 +39,76 @@ function parseAssistantContent(content: string) {
 export default function ChatMessage({ message, showAvatar }: Props) {
   const isUser = message.role === "user";
 
-  /* ── ユーザーメッセージ ── */
+  /* ── ユーザー ── */
   if (isUser) {
     return (
-      <div className="flex flex-col items-end gap-0.5 animate-pop-in mb-2">
-        <div className="flex items-end gap-2">
+      <div className="flex flex-col items-end gap-0.5 animate-pop-in mb-1">
+        <div className="flex items-end gap-1.5">
           {/* 既読 / 時刻 */}
-          <div className="flex flex-col items-end gap-0.5 pb-1">
+          <div className="flex flex-col items-end gap-0.5 pb-0.5">
             <span
-              className="text-[10px] font-semibold leading-none transition-all duration-500"
-              style={{ color: message.read ? "#86efac" : "rgba(255,255,255,0.5)" }}
+              className="text-[10px] font-medium leading-none transition-colors duration-500"
+              style={{ color: message.read ? "#FF6B6B" : "#BBBBBB" }}
             >
               {message.read ? "既読" : "未読"}
             </span>
-            <span className="text-[10px] leading-none text-white/45">
+            <span className="text-[10px] text-gray-400 leading-none">
               {formatTime(message.timestamp)}
             </span>
           </div>
-          {/* 吹き出し */}
+          {/* バブル */}
           <div
-            className="bubble-user max-w-[72%] text-white px-4 py-2.5 rounded-[20px] rounded-br-[5px] font-medium"
+            className="max-w-[72%] text-white text-sm leading-relaxed px-4 py-2.5 rounded-[20px] rounded-br-[5px] shadow-sm whitespace-pre-wrap"
+            style={{ background: "#FF6B6B" }}
           >
-            <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+            {message.content}
           </div>
         </div>
       </div>
     );
   }
 
-  /* ── AI メッセージ ── */
+  /* ── AI ── */
   const sections = parseAssistantContent(message.content);
 
   return (
-    <div className="flex items-end gap-2 animate-pop-in mb-2">
+    <div className="flex items-end gap-2 animate-pop-in mb-1">
       {/* アバター */}
-      <div className="w-9 flex-shrink-0 self-end mb-1">
+      <div className="w-8 flex-shrink-0 self-end mb-0.5">
         {showAvatar && (
-          <div
-            className="w-9 h-9 rounded-2xl flex items-center justify-center shadow-lg"
-            style={{
-              background: "rgba(255,255,255,0.22)",
-              border: "1.5px solid rgba(255,255,255,0.45)",
-              backdropFilter: "blur(12px)",
-            }}
-          >
-            <KoiLogo size={26} />
+          <div className="w-8 h-8 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center">
+            <KoiLogo size={22} />
           </div>
         )}
       </div>
 
-      <div className="flex items-end gap-2 max-w-[76%]">
-        <div className="space-y-2 flex-1">
+      <div className="flex items-end gap-1.5 max-w-[78%]">
+        <div className="space-y-1.5 flex-1">
           {sections ? (
             sections.map((section) => {
               const s = SECTION_STYLES[section.title] ?? {
-                gradient: "linear-gradient(135deg, #f9fafb, #f3f4f6)",
-                border: "2px solid rgba(156,163,175,0.3)",
-                labelColor: "#6b7280",
-                emoji: "💬",
+                border: "#D1D5DB", label: "#6B7280", emoji: "💬",
               };
               return (
                 <div
                   key={section.title}
-                  className="px-4 py-3 rounded-[20px] rounded-bl-[5px] shadow-md"
-                  style={{
-                    background: s.gradient,
-                    border: s.border,
-                    backdropFilter: "blur(8px)",
-                  }}
+                  className="bg-white rounded-[20px] rounded-bl-[5px] shadow-sm overflow-hidden"
+                  style={{ border: "1px solid #F0F0F0", borderLeft: `3px solid ${s.border}` }}
                 >
-                  <div className="flex items-center gap-1.5 mb-2">
+                  <div className="px-4 pt-3 pb-0.5 flex items-center gap-1.5">
                     <span className="text-sm">{s.emoji}</span>
-                    <span className="text-xs font-bold" style={{ color: s.labelColor }}>
+                    <span className="text-xs font-bold" style={{ color: s.label }}>
                       {section.title}
                     </span>
                   </div>
-                  <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap">
+                  <p className="px-4 pt-1.5 pb-3 text-sm leading-relaxed text-gray-700 whitespace-pre-wrap">
                     {section.body}
                   </p>
                 </div>
               );
             })
           ) : (
-            <div
-              className="px-4 py-3 rounded-[20px] rounded-bl-[5px] shadow-md"
-              style={{
-                background: "rgba(255,255,255,0.88)",
-                backdropFilter: "blur(16px)",
-              }}
-            >
+            <div className="bg-white border border-gray-100 rounded-[20px] rounded-bl-[5px] shadow-sm px-4 py-2.5">
               <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap">
                 {message.content}
               </p>
@@ -150,8 +116,7 @@ export default function ChatMessage({ message, showAvatar }: Props) {
           )}
         </div>
 
-        {/* 時刻 */}
-        <span className="text-[10px] text-white/45 pb-1 flex-shrink-0 self-end whitespace-nowrap">
+        <span className="text-[10px] text-gray-400 pb-1 flex-shrink-0 self-end whitespace-nowrap">
           {formatTime(message.timestamp)}
         </span>
       </div>
