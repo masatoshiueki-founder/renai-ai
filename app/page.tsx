@@ -97,7 +97,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#BEE3C8]">
+    <div className="flex flex-col h-screen chat-bg">
       <Header isTyping={isTyping} />
 
       <main className="flex-1 flex flex-col max-w-2xl mx-auto w-full overflow-hidden">
@@ -105,10 +105,16 @@ export default function Home() {
         <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1 scrollbar-thin">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full py-16 text-center">
-              <div className="w-20 h-20 rounded-full bg-white/60 flex items-center justify-center mb-4 shadow-sm overflow-hidden">
-                <KoiLogo size={52} />
+              <div
+                className="w-24 h-24 rounded-3xl flex items-center justify-center mb-5 shadow-xl overflow-hidden"
+                style={{
+                  background: "linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)",
+                  boxShadow: "0 8px 32px rgba(6,199,85,0.25)",
+                }}
+              >
+                <KoiLogo size={60} />
               </div>
-              <p className="text-[#2a6640] font-bold text-base mb-1">KoiAI</p>
+              <p className="font-extrabold text-xl mb-1 shimmer-text">KoiAI</p>
               <p className="text-[#3d7a50]/70 text-xs mb-8">Love advice, powered by AI</p>
               <div className="grid grid-cols-1 gap-2 w-full max-w-xs">
                 {[
@@ -119,7 +125,7 @@ export default function Home() {
                   <button
                     key={suggestion}
                     onClick={() => sendMessage(suggestion)}
-                    className="text-left text-sm bg-white/70 rounded-2xl px-4 py-3 text-gray-600 hover:bg-white transition-colors shadow-sm"
+                    className="text-left text-sm bg-white/80 rounded-2xl px-4 py-3 text-gray-600 hover:bg-white transition-all shadow-sm hover:shadow-md hover:translate-x-1 duration-200"
                   >
                     {suggestion}
                   </button>
@@ -141,7 +147,10 @@ export default function Home() {
 
           {isTyping && (
             <div className="flex items-end gap-2 pt-1 animate-fade-slide-in">
-              <div className="w-9 h-9 rounded-full overflow-hidden bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
+              <div
+                className="w-9 h-9 rounded-2xl overflow-hidden flex items-center justify-center flex-shrink-0 shadow-md"
+                style={{ background: "linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)" }}
+              >
                 <KoiLogo size={28} />
               </div>
               <div className="bg-white px-4 py-3 rounded-[18px] rounded-bl-[4px] shadow-sm">
