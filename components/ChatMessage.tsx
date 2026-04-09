@@ -11,21 +11,21 @@ function formatTime(date: Date) {
 
 const SECTION_STYLES = {
   "相手の心理": {
-    gradient: "linear-gradient(135deg, #fdf4ff 0%, #f3e8ff 100%)",
-    border: "2px solid rgba(192,132,252,0.4)",
-    labelColor: "#a855f7",
+    gradient: "linear-gradient(135deg, #fff5f7 0%, #ffe4ea 100%)",
+    border: "2px solid rgba(255,143,171,0.45)",
+    labelColor: "#e05580",
     emoji: "🧠",
   },
   "取るべき行動": {
-    gradient: "linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%)",
-    border: "2px solid rgba(244,114,182,0.4)",
-    labelColor: "#ec4899",
+    gradient: "linear-gradient(135deg, #fff6f0 0%, #ffe8dd 100%)",
+    border: "2px solid rgba(255,130,100,0.45)",
+    labelColor: "#d95f3b",
     emoji: "✨",
   },
   "送るメッセージ案": {
-    gradient: "linear-gradient(135deg, #eff6ff 0%, #ede9fe 100%)",
-    border: "2px solid rgba(129,140,248,0.4)",
-    labelColor: "#6366f1",
+    gradient: "linear-gradient(135deg, #fffaf4 0%, #ffeedd 100%)",
+    border: "2px solid rgba(255,180,110,0.45)",
+    labelColor: "#c97c2a",
     emoji: "💌",
   },
 } as const;

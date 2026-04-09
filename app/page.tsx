@@ -96,12 +96,12 @@ export default function Home() {
     <div className="glamour-bg flex flex-col h-screen relative overflow-hidden">
       {/* 装飾ブロブ */}
       <div
-        className="absolute -top-24 -right-24 w-72 h-72 rounded-full pointer-events-none opacity-30 blur-3xl"
-        style={{ background: "radial-gradient(circle, #fde68a, #fb7185)" }}
+        className="absolute -top-24 -right-24 w-72 h-72 rounded-full pointer-events-none opacity-40 blur-3xl"
+        style={{ background: "radial-gradient(circle, #FFE4AE, #FFB5C8)" }}
       />
       <div
-        className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full pointer-events-none opacity-25 blur-3xl"
-        style={{ background: "radial-gradient(circle, #818cf8, #6d28d9)" }}
+        className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full pointer-events-none opacity-30 blur-3xl"
+        style={{ background: "radial-gradient(circle, #FFB59A, #FF8FAB)" }}
       />
 
       <Header isTyping={isTyping} />
@@ -192,9 +192,9 @@ export default function Home() {
                 }}
               >
                 <div className="flex gap-1.5 items-center h-4">
-                  <span className="w-2 h-2 bg-purple-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                  <span className="w-2 h-2 bg-pink-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                  <span className="w-2 h-2 bg-fuchsia-400 rounded-full animate-bounce" />
+                  <span className="w-2 h-2 bg-pink-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                  <span className="w-2 h-2 bg-rose-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                  <span className="w-2 h-2 bg-orange-300 rounded-full animate-bounce" />
                 </div>
               </div>
             </div>
@@ -221,9 +221,9 @@ export function KoiLogo({ size = 36 }: { size?: number }) {
     >
       <defs>
         <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%"   stopColor="#f472b6" />
-          <stop offset="50%"  stopColor="#c084fc" />
-          <stop offset="100%" stopColor="#818cf8" />
+          <stop offset="0%"   stopColor="#FF8FAB" />
+          <stop offset="55%"  stopColor="#FF6E6E" />
+          <stop offset="100%" stopColor="#FFB59A" />
         </linearGradient>
         <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%"   stopColor="#fde68a" />
